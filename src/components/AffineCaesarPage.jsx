@@ -4,6 +4,10 @@ const AffineCaesarPage = () => {
   const [plainText, setPlainText] = useState('');
   const [encryptedText, setEncryptedText] = useState('');
   const [decryptedText, setDecryptedText] = useState('');
+  const [caesarEncryptedText, setCaesarEncryptedText] = useState('');
+  const [caesarDecryptedText, setCaesarDecryptedText] = useState('');
+  const [caesarShift, setCaesarShift] = useState(''); // Default shift value for Caesar Cipher
+
 
   const a = 17;
   const b = 20;
@@ -46,23 +50,63 @@ const AffineCaesarPage = () => {
     return msg;
   };
 
+  const caesarEncrypt = (text, shift) => {
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+      let char = text[i];
+      let code = char.charCodeAt(0);
+      let offset = code >= 65 && code <= 90 ? 65 : 97;
+      let shifted = (code - offset + shift) % 26;
+      if (shifted < 0) {
+        shifted += 26;
+      }
+      let ch = String.fromCharCode(shifted + offset);
+      result += ch;
+    }
+    return result;
+  };
+  
+  const caesarDecrypt = (text, shift) => {
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+      let char = text[i];
+      let code = char.charCodeAt(0);
+      let offset = code >= 65 && code <= 90 ? 65 : code >= 97 && code <= 122 ? 97 : null;
+      if (offset !== null) {
+        let shifted = (code - offset - shift + 26) % 26;
+        let ch = String.fromCharCode(shifted + offset);
+        result += ch;
+      } else {
+        result += char; // Keep non-alphabetic characters unchanged
+      }
+    }
+    return result;
+  };
+  
+  
+
   const handleEncrypt = () => {
     const encryptedMessage = encryptMessage(plainText.toUpperCase());
+    const caesarEncrypted = caesarEncrypt(plainText.toUpperCase(), caesarShift);
     setEncryptedText(encryptedMessage);
+    setCaesarEncryptedText(caesarEncrypted);
   };
 
   const handleDecrypt = () => {
     const decryptedMessage = decryptCipher(encryptedText.toUpperCase());
+    const caesarDecrypted = caesarDecrypt(decryptedMessage.toUpperCase(), caesarShift);
     setDecryptedText(decryptedMessage);
+    setCaesarDecryptedText(caesarDecrypted);
   };
 
+
   const handleClick = () => {
-    alert('WALA PA');
+    alert('INAMO');
   };
 
   return (
     <div className="card" style={{marginLeft: '225px', marginRight: '200px' , border: 'none'}}>
-      <h2 className="card-header" style={{ fontWeight: '800' }}>AFFINE CIPHER & CAESAR CIPHER</h2>
+      <h2 className="card-header" style={{ fontWeight: '800',backgroundColor: 'white' }}>AFFINE CIPHER & CAESAR CIPHER</h2>
       <div className="card-body">
         <h5 className="card-title">Affine Cipher</h5>
         <p className="card-text">
@@ -203,17 +247,23 @@ const AffineCaesarPage = () => {
 
         </p>
         <a href="#" className="btn btn-success" onClick={handleClick}>Try it yourself</a>
-        <div className="cipher-inputs">
-        <textarea
-          value={plainText}
-          onChange={(e) => setPlainText(e.target.value)}
-          placeholder="Enter text to encrypt"
-        />
-        <button onClick={handleEncrypt}>Encrypt</button>
-        <p>Encrypted Text: {encryptedText}</p>
-        <button onClick={handleDecrypt}>Decrypt</button>
-        <p>Decrypted Text: {decryptedText}</p>
-      </div>
+        <div className="card" style={{ width: '32rem', border: 'none', margin: 'auto' }}>
+      <textarea
+        value={plainText}
+        onChange={(e) => setPlainText(e.target.value)}
+        placeholder="Enter text to encrypt"
+      />
+      <input
+        type="number"
+        value={caesarShift}
+        onChange={(e) => setCaesarShift(parseInt(e.target.value))}
+        placeholder="Enter Caesar shift value"
+      />
+      <button className="btn btn-success"  onClick={handleEncrypt}>Encrypt</button>
+      <p>Encrypted Text: {caesarEncryptedText}</p>
+      <button className="btn btn-danger" style={{backgroundColor: 'rgb(42,42,44)'}} onClick={handleDecrypt}>Decrypt</button>
+      <p>Decrypted Text: {caesarDecryptedText}</p>
+    </div>
 
   
       </div>
